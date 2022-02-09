@@ -9,6 +9,9 @@ type Configuration struct {
 	BrokerAddr             string `json:"broker_addr"`
 	BrokerPort             int    `json:"broker_port"`
 	MqttSupervisorClientID string `json:"mqtt_supervisor_clientid"`
+	HttpAddr               string `json:"http_addr"`
+	HttpPort               int    `json:"http_port"`
+	SqlitePath             string `json:"sqlite_path"`
 }
 
 func LoadConfiguration(filepath string) (Configuration, error) {
