@@ -41,6 +41,7 @@ func (server *HttpServer) LoadRoutes() {
 		{
 			device.POST("", server.NewDevice)
 			device.GET("", server.GetAllDevice)
+			device.GET(":id", server.GetDeviceByID)
 		}
 	}
 }

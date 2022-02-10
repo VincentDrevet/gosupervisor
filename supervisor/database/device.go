@@ -1,9 +1,9 @@
 package database
 
-import "gorm.io/gorm"
-
 type Device struct {
-	gorm.Model
-	DeviceID   string
-	DeviceName string
+	DeviceID     string
+	DeviceName   string
+	ErrorTopic   string
+	CommandTopic string
+	DataTopic    string
 }
