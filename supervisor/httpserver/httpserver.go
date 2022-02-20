@@ -24,7 +24,7 @@ func NewHttpServer(configuration configuration.Configuration) HttpServer {
 		log.Fatalf("%s\n", err.Error())
 	}
 
-	db.AutoMigrate(&database.Device{})
+	db.AutoMigrate(&database.Controller{}, &database.InputDevice{}, &database.Metric{})
 
 	return HttpServer{
 		Engine:   gin.Default(),
@@ -37,11 +37,25 @@ func NewHttpServer(configuration configuration.Configuration) HttpServer {
 func (server *HttpServer) LoadRoutes() {
 	api := server.Engine.Group("/api")
 	{
-		device := api.Group("/device")
+		controller := api.Group("/controller")
 		{
-			device.POST("", server.NewDevice)
-			device.GET("", server.GetAllDevice)
-			device.GET(":id", server.GetDeviceByID)
+			controller.POST("", server.NewController)
+			controller.GET("", server.GetAllController)
+			controller.GET(":id", server.GetControllerByID)
+			controller.DELETE(":id", server.DeleteControllerByID)
+
+			/*
+				Gestion périphérique d'entrée
+			*/
+			controller.POST(":id/inputdevice", server.NewInputDevice)
+			controller.GET(":id/inputdevice/:id_inputdevice", server.GetInputDeviceByIDAndByController)
+			controller.GET(":id/inputdevice", server.GetAllInputDeviceOfController)
+			controller.DELETE(":id/inputdevice/:id_inputdevice", server.DeleteInputDevice)
+		}
+		metric := api.Group("/metric")
+		{
+			metric.POST("", server.NewMetric)
+			metric.GET("", server.getAllMetrics)
 		}
 	}
 }
