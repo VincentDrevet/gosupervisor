@@ -28,6 +28,15 @@ func (server *HttpServer) NewInputDevice(c *gin.Context) {
 		return
 	}
 
+	if result := server.Database.Where("controller_id = ?", controllerid.Id).First(&database.Controller{}); result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			ReturnError(http.StatusNotFound, result.Error, c)
+			return
+		}
+		ReturnError(http.StatusInternalServerError, result.Error, c)
+		return
+	}
+
 	newInputDevice := database.InputDevice{
 		InputDeviceName: InputDevicebody.InputDeviceName,
 		Metrics:         InputDevicebody.Metrics,
@@ -80,12 +89,13 @@ func (server *HttpServer) GetAllInputDeviceOfController(c *gin.Context) {
 
 	var InputDevices []database.InputDevice
 
-	if result := server.Database.Where("controller_id = ?", requesturi.Id).Preload("Metrics").Find(&InputDevices); result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			ReturnError(http.StatusNotFound, result.Error, c)
-			return
-		}
+	if result := server.Database.Debug().Where("controller_id = ?", requesturi.Id).Preload("Metrics").Find(&InputDevices); result.Error != nil {
 		ReturnError(http.StatusInternalServerError, result.Error, c)
+		return
+	}
+
+	if len(InputDevices) == 0 {
+		ReturnError(http.StatusNotFound, gorm.ErrRecordNotFound, c)
 		return
 	}
 
